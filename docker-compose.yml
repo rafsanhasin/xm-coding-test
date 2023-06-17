@@ -1,0 +1,36 @@
+version: '2'
+
+services:
+    nginx:
+        image: nginx:1.25.1
+        ports:
+            - 80:80
+        volumes:
+            - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+        volumes_from:
+            - php
+        networks:
+            - xm-test
+
+    php:
+        build: ./docker/php/
+        volumes:
+            - .:/var/www/html
+        networks:
+            - xm-test
+
+    redis:
+        image: redis:6.2-alpine
+        restart: always
+        ports:
+            - '6379:6379'
+        environment:
+            - ALLOW_EMPTY_PASSWORD=yes
+        volumes:
+            - ~/.backup/cache-data/xm-test:/var/lib/cache/data
+        networks:
+            - xm-test
+
+networks:
+    xm-test:
+        external: true
